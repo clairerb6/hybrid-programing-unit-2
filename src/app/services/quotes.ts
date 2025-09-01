@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { ToastController } from '@ionic/angular';
+import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { Quote } from '../models/quote.model';
 
 const isWeb = Capacitor.getPlatform() === 'web';
@@ -21,7 +22,7 @@ export class QuotesService {
   private quotes: Quote[] = [];
   private db!: SQLiteDBConnection;
 
-  constructor() {
+  constructor(private toastCtrl: ToastController) {
     if (isWeb) {
       this.loadFromStorage();
     } else {
@@ -29,19 +30,24 @@ export class QuotesService {
     }
   }
 
+  private async showToast(message: string) {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2000,
+      position: 'bottom'
+    });
+    await toast.present();
+  }
   // ======================
   // Inicializar SQLite
   // ======================
   private async initSQLite() {
     try {
-      const sqlite = CapacitorSQLite;
-      this.db = (await sqlite.createConnection({
-        database: 'quotes_db',
-        version: 1,
-        encrypted: false,
-        mode: 'no-encryption'
-      }) as unknown) as SQLiteDBConnection;
-
+      const sqliteConnection: SQLiteConnection = new SQLiteConnection(CapacitorSQLite);
+      const isConn = await sqliteConnection.isConnection('quotes_db', false);
+      this.db = isConn.result
+        ? await sqliteConnection.retrieveConnection('quotes_db', false)
+        : await sqliteConnection.createConnection('quotes_db', false, 'no-encryption', 1, false);
       await this.db.open();
 
       // Crear tabla si no existe
@@ -62,10 +68,14 @@ export class QuotesService {
         for (let q of initialQuotes) {
           await this.db.run('INSERT INTO quotes (text, author, createdAt) VALUES (?, ?, ?)', [q.text, q.author, q.createdAt]);
         }
+        this.showToast('Datos iniciales insertados 🚀');
+      } else {
+        this.showToast('BD ya contenía datos 📚');
       }
 
       await this.loadFromSQLite();
     } catch (err) {
+      this.showToast('Error inicializando BD: ' + err);
       console.error('Error inicializando SQLite:', err);
     }
   }
@@ -94,8 +104,14 @@ export class QuotesService {
   // Carga desde SQLite
   // ======================
   private async loadFromSQLite() {
-    const result = await this.db.query('SELECT * FROM quotes');
-    this.quotes = result.values ? result.values as Quote[] : [];
+    try {
+      const res = await this.db.query('SELECT * FROM quotes');
+      this.showToast(`Cargadas ${res.values?.length || 0} citas ✨`);
+      this.quotes = res.values as Quote[];
+    } catch (err) {
+      this.showToast('Error leyendo citas: ' + err);
+      this.quotes = [];
+    }
   }
 
   // ======================
