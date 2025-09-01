@@ -12,15 +12,14 @@ import { IonHeader,
   IonLabel,
   IonInput,
   IonButton,
-  IonList
-} from "@ionic/angular/standalone";  
+  IonList, IonText } from "@ionic/angular/standalone";  
 import { Quote } from 'src/app/models/quote.model';
 
 @Component({
   selector: 'app-manage',
   templateUrl: './manage.page.html',
   styleUrls: ['./manage.page.scss'],
-  imports: [
+  imports: [IonText, 
     IonList,
     IonButton,
     IonInput,
@@ -33,14 +32,16 @@ import { Quote } from 'src/app/models/quote.model';
     IonButtons,
     IonHeader,
     FormsModule,
-    CommonModule
+    CommonModule,
   ],
 })
 export class ManagePage implements OnInit {
   quotes: Quote[] = [];
-  newQuote: Quote = { text: '', author: '' };
+  newQuote: Quote = { id: 0, text: '', author: '', createdAt: new Date().getTime() };
+  errorMessages: string[] = [];
 
   constructor(private quotesService: QuotesService) {}
+  
 
   ngOnInit() {
     this.loadQuotes();
@@ -51,11 +52,20 @@ export class ManagePage implements OnInit {
   }
 
   addQuote() {
-    if (this.newQuote.text && this.newQuote.author) {
-      this.quotesService.addQuote({ ...this.newQuote });
-      this.newQuote = { text: '', author: '' };
-      this.loadQuotes();
+    this.errorMessages = [];
+
+    if (!this.newQuote.text || this.newQuote.text.trim().length < 5) {
+      this.errorMessages.push('La frase debe tener al menos 5 caracteres.');
     }
+
+    if (!this.newQuote.author || this.newQuote.author.trim().length < 2) {
+      this.errorMessages.push('El autor debe tener al menos 2 caracteres.');
+    }
+    if (this.errorMessages) return;
+
+    this.quotesService.addQuote({ ...this.newQuote });
+    this.newQuote = { id: 0, text: '', author: '', createdAt: new Date().getTime() };
+    this.loadQuotes();
   }
 
   deleteQuote(index: number | undefined) {

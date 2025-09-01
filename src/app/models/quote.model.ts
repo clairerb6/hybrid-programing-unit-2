@@ -1,6 +1,6 @@
 export interface Quote {
-  id?: number;
+  id: number;
   text: string;
   author: string;
-  createdAt?: number;
+  createdAt: number;
 }

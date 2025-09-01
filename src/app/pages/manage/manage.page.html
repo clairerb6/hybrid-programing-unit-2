@@ -17,6 +17,9 @@
       <ion-label position="floating">Autor</ion-label>
       <ion-input [(ngModel)]="newQuote.author" name="author"></ion-input>
     </ion-item>
+    @for (err of errorMessages; track $index) {
+      <ion-text color="danger">{{ err }}</ion-text><br />
+    }
     <ion-button expand="block" type="submit">Agregar</ion-button>
   </form>
 
