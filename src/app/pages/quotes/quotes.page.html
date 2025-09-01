@@ -8,12 +8,21 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card>
-    <ion-card-content>
-      <h2>{{ randomQuote.text }}</h2>
-      <p class="ion-text-right">— {{ randomQuote.author }}</p>
-    </ion-card-content>
-  </ion-card>
-  <ion-button (click)="getRandomQuote()" color="primary">Otra...</ion-button>
-</ion-content>
+
+  <ion-content class="ion-padding">
+  @if (randomQuote) {
+    <ion-card>
+      <ion-card-content>
+        <p>{{ randomQuote.text }}</p>
+        <p class="author">{{ randomQuote.author }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    @if (allowDeleteOnRandom) {
+      <ion-button color="danger" (click)="deleteQuote()">Eliminar</ion-button>
+    }
+    <ion-button (click)="loadRandomQuote()">Otra Cita</ion-button>
+  } @else {
+    <p>No hay citas disponibles.</p>
+  }
+  </ion-content>

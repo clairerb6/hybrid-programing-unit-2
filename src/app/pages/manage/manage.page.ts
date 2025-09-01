@@ -47,11 +47,11 @@ export class ManagePage implements OnInit {
     this.loadQuotes();
   }
 
-  loadQuotes() {
-    this.quotes = this.quotesService.getAllQuotes();
+  async loadQuotes() {
+    this.quotes = await this.quotesService.getAllQuotes();
   }
 
-  addQuote() {
+  async addQuote() {
     this.errorMessages = [];
 
     if (!this.newQuote.text || this.newQuote.text.trim().length < 5) {
@@ -63,13 +63,13 @@ export class ManagePage implements OnInit {
     }
     if (this.errorMessages) return;
 
-    this.quotesService.addQuote({ ...this.newQuote });
+    await this.quotesService.addQuote({ ...this.newQuote });
     this.newQuote = { id: 0, text: '', author: '', createdAt: new Date().getTime() };
-    this.loadQuotes();
+    await this.loadQuotes();
   }
 
-  deleteQuote(index: number | undefined) {
-    this.quotesService.deleteQuote(index as number);
-    this.loadQuotes();
+  async deleteQuote(index: number | undefined) {
+    await this.quotesService.deleteQuote(index as number);
+    await this.loadQuotes();
   }
 }

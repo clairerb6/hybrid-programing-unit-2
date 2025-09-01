@@ -9,7 +9,7 @@
 
 <ion-content class="ion-padding">
   <ion-item>
-    <ion-label>¿Desea poder borrar citas en el inicio?</ion-label>
-    <ion-toggle [(ngModel)]="allowDelete"></ion-toggle>
+    <ion-label>¿Permitir borrar citas en la página de inicio?</ion-label>
+    <ion-toggle [checked]="allowDeleteOnRandom" (ionChange)="toggleAllowDelete()"></ion-toggle>
   </ion-item>
 </ion-content>
