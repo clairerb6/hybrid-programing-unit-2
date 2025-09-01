@@ -1,0 +1,11 @@
+<ion-card *ngIf="quote">
+  <ion-card-content>
+    <p class="quote-text">“{{ quote?.text }}”</p>
+    <p class="quote-author">— {{ quote?.author }}</p>
+
+    <ion-button *ngIf="deletable && quote.id" (click)="deleteQuote.emit(quote?.id)" expand="block" fill="outline" color="danger">
+      <ion-icon slot="start" name="trash-outline"></ion-icon>
+      Eliminar
+    </ion-button>
+  </ion-card-content>
+</ion-card>
