@@ -1,0 +1,7 @@
+{
+  "name": "hybrid-programing-unit-2",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
